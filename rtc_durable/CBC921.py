@@ -59,7 +59,8 @@ class CBC921(object) :
 
     # get datetime
     def gett(self,alarm) :
-        self.put(0x1C,0x60)
+        #self.put(0x1C,0x60)
+	self.put(0x1C,0x20)
         self.put(0x22,0x01)     # LATCH _OUT = 1
         adr = 0x00
         if alarm == True :

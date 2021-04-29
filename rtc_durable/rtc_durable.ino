@@ -99,7 +99,6 @@ void setZeros(struct  _registers *rg)
 uint8_t RTCaddr = 0x55;
 void readMeasurements()
 {
-  
   Wire.beginTransmission(RTCaddr);
   Wire.write(0x1C);
   Wire.write(0x20);
@@ -123,17 +122,34 @@ void readMeasurements()
     if (Wire.available() > 0)
     {
       int c = Wire.read();
+      //Serial.print("next char is "); Serial.print(c); Serial.print("  recv ="); Serial.print(recv);
       lastRead.Carray[recv] = (c/16 * 10) + c %16;
+      //Serial.print("  Stored val="); Serial.println(lastRead.Carray[recv]);
       recv++;
     }
   }
   if (recv < 6)
   {
+    //Serial.print("recv < 6 is true ");
+    //Serial.println(recv);
     setZeros(&lastRead.regs);
     return;
   }
 
   //reading temp
+  Wire.beginTransmission(RTCaddr);
+  Wire.write(0x22);
+  Wire.endTransmission();
+  Wire.requestFrom(RTCaddr, (uint8_t)1 );
+  recv = Wire.read();
+  recv |= 0x80;
+  Wire.beginTransmission(RTCaddr);
+  Wire.write(0x22);
+  Wire.write(recv);
+  Wire.endTransmission();
+
+  delay(1000);
+  
   Wire.beginTransmission(RTCaddr);
   Wire.write(0x1E);
   Wire.endTransmission();
@@ -152,12 +168,15 @@ void readMeasurements()
       recv++;
     }
   }
-  if (recv < 6)
+  if (recv < 2)
   {
-    setZeros(&lastRead.regs);
+    //setZeros(&lastRead.regs);
     return;
   }
-  lastRead.regs.temp = ((uint16_t)tempR[0])<<4 + (tempR[1]>>6);
+  //Serial.print("rq0 ="); Serial.print(tempR[0]); Serial.print("rq0 ="); Serial.print(tempR[1]);
+  lastRead.regs.temp = (((uint16_t)tempR[0])<<2) + (tempR[1]>>6);
+  //Serial.print("temp reg ="); Serial.print(lastRead.regs.temp); Serial.print("  eq to"); Serial.println(0.5 * lastRead.regs.temp - 273);
+  //Serial.print("temp reg ="); Serial.print(lastRead.Carray[6]); Serial.print(" "); Serial.println(lastRead.Carray[6]);
 }
 
 void outputLine(int row, const struct _registers *rg)
@@ -171,7 +190,7 @@ void outputLine(int row, const struct _registers *rg)
   lcd.print("/");
   if (rg->month < 10)
   {
-    lcd.print(" ");
+    lcd.print("0");
   }
   lcd.print(rg->month);
   lcd.print(" ");
@@ -182,7 +201,8 @@ void outputLine(int row, const struct _registers *rg)
   }
   lcd.print(rg->hour);
   lcd.print(":");
-  if (rg->mins > 10)
+  
+  if (rg->mins < 10)
   {
     lcd.print("0");
   }

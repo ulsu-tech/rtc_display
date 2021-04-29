@@ -40,7 +40,7 @@ def main():
         print("%02d:" % ( int(v[1]/16) * 10 +  v[1] % 16), end = "")
         print("%02d  " % ( int(v[0]/16) * 10 +  v[0] % 16), end = "")
 
-        print("temp = ", (v[6] * 4 + (v[7]>>6)) * 0.5 - 273)
+        print("temp = ", (v[6]  + v[7]*256) * 0.5 - 273)
 
 if __name__ == '__main__':
     main()
