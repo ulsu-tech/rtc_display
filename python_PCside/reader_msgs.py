@@ -11,7 +11,7 @@ def main():
 
     serialPort = serial.Serial("/dev/" + portName)
 
-    serialPort.open()
+    #serialPort.open()
 
     while True:
         v = serialPort.read(8)
@@ -27,14 +27,14 @@ def main():
         serialPort.write(wrValue)
 
         for a in v:
-            print("%02x" % a,  end="")
+            print("%02x " % a,  end="")
 
         print("")
 
         # sequence is sec, min, hour, day, month, year, tem-temp
         print("%04d/" % ( int(v[5] /16) * 10 + v[5] % 16), end="")
-        print("%02/" % ( int(v[4]/16) * 10 +  v[4] % 16), ennd= "")
-        print("%02 " % ( int(v[3]/16) * 10 +  v[3] % 16), end = "")
+        print("%02d/" % ( int(v[4]/16) * 10 +  v[4] % 16), end= "")
+        print("%02d " % ( int(v[3]/16) * 10 +  v[3] % 16), end = "")
 
         print("%02d:" % ( int(v[2]/16) * 10 +  v[2] % 16), end = "")
         print("%02d:" % ( int(v[1]/16) * 10 +  v[1] % 16), end = "")

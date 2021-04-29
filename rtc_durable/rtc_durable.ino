@@ -17,11 +17,11 @@
  */
 // initialize the library by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
-const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+const int rs = 8, en = 9, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 unsigned long lastExec =0;
-unsigned measureDuration = 4 * 60 * 60 * 1000;
+unsigned long measureDuration = 4 * 1000;
 //value for now
 
 struct _registers 
@@ -50,8 +50,11 @@ union _arrayed prevRead = {0};
 void setup() {
   // put your setup code here, to run once:
   lcd.begin(16, 2);
+  delay(500);
   Serial.begin(9600);
   Wire.begin();
+  lcd.setCursor(0,0);
+  lcd.print("Hello");
 }
 
 void loop() {
@@ -93,10 +96,20 @@ void setZeros(struct  _registers *rg)
   rg->temp = 0;
 }
 
-uint8_t RTCaddr = 0xAA;
+uint8_t RTCaddr = 0x55;
 void readMeasurements()
 {
-  // TODO
+  
+  Wire.beginTransmission(RTCaddr);
+  Wire.write(0x1C);
+  Wire.write(0x20);
+  Wire.endTransmission();
+  
+  Wire.beginTransmission(RTCaddr);
+  Wire.write(0x22);
+  Wire.write(0x01);
+  Wire.endTransmission();
+  
   Wire.beginTransmission(RTCaddr);
   Wire.write(1);
   Wire.endTransmission();
